@@ -59,6 +59,8 @@
 		<capsule.version>1.0.3</capsule.version>
 		<capsule.maven.version>1.0.3</capsule.maven.version>
 		<capsule.maven.plugin.version>1.5.1</capsule.maven.plugin.version>
+
+		<org.apache.spark.version>2.3.1</org.apache.spark.version>
 	</properties>
 
 	<dependencies>
@@ -68,6 +70,17 @@
 			<groupId>co.paralleluniverse</groupId>
 			<artifactId>capsule</artifactId>
 			<version>${capsule.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.spark</groupId>
+			<artifactId>spark-core_2.11</artifactId>
+			<version>${org.apache.spark.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.spark</groupId>
+			<artifactId>spark-sql_2.11</artifactId>
+			<version>${org.apache.spark.version}</version>
 		</dependency>
 
 		<!-- DEFAULT SCOPED (i.e COMPILE) DEPENDENCY EXAMPLE -->
