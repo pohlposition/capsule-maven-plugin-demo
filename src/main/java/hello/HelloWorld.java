@@ -2,7 +2,12 @@ package hello;
 
 import org.apache.spark.sql.*;
 import static org.apache.spark.sql.functions.col;
+
+import java.io.IOException;
 import java.io.Serializable;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
@@ -90,17 +95,31 @@ public class HelloWorld {
 		}
 	}
 
+    static String readFile(String path, Charset encoding)
+    {
+        try{
+            byte[] encoded = Files.readAllBytes(Paths.get(path));
+            return new String(encoded, encoding).replace(System.getProperty("line.separator"),"");
+        } catch(IOException e) {
+            System.out.println("File Not Found: "+path);
+        }
+        return null;
+    }
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Exception {
 		System.out.println("Hello, World");
 		System.out.println("System-Properties:");
 		System.out.println("\t\\--propertyName1=" + System.getProperty("propertyName1"));
 		System.out.println("\t\\--propertyName2=" + System.getProperty("propertyName2"));
 //		final ImmutableCollection col = ImmutableList.of("hello","hello1"); // using guava lib
 
+        String masterIP = readFile("/databricks/driver/driver_ip.txt", Charset.defaultCharset());
+
 		SparkSession spark = SparkSession
 				.builder()
 				.appName("capsule-maven-plugin-demo")
+                .master("spark://" + masterIP + ":7077")
+                //.master("spark://127.0.0.1:7077")  //Connection refused: /127.0.0.1:7077
 				.getOrCreate();
 
 		Encoder<Cust> custEncoder = Encoders.bean(Cust.class);
@@ -119,7 +138,7 @@ public class HelloWorld {
 		ds.printSchema();
 
 		System.out.println("*** here is the data");
-		ds.show();
+		ds.repartition(5).show();
 
 		Dataset<Row> smallerDF =
 				ds.select("sales", "state").filter(col("state").equalTo("CA"));
